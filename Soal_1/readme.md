@@ -3,6 +3,7 @@
 Dokumentasi analisis pengujian struktural (*White-Box Testing*) pada program penyelesaian persamaan kuadrat (\(ax^2 + bx + c = 0\)) dengan parameter pengukuran *Statement Coverage* (SC), *Branch Coverage* (BC), dan *Loop Coverage* (LC) mengacu pada paper Khairunnisya dkk. (EECSI 2017).
 
 ## Algoritma Program
+
 1. Inisialisasi variabel perulangan ulang = 'Y'.
 2. Evaluasi kondisi loop ulang == 'Y'. Jika tidak terpenuhi, program berhenti.
 3. Baca nilai input koefisien a, b, dan c.
@@ -16,6 +17,7 @@ Dokumentasi analisis pengujian struktural (*White-Box Testing*) pada program pen
 6. Minta input konfirmasi dari pengguna untuk mengulang program (ulang).Kembali ke evaluasi kondisi loop (Langkah 2).
 
 ## Kode Program & Pemetaan Simpul (Nodes)
+
 ```python
 import math
 
@@ -41,4 +43,21 @@ import math
 ```
 
 ## Control Flow Graph (CFG)
+
 ![CFG](./img/cfg.png)
+
+## Cyclomatic Complexity & Jalur Independen (Basis Paths)
+
+### Perhitungan Cyclomatic Complexity ($V(G)$):
+- Berdasarkan Predicate Nodes ($P$):
+Terdapat 3 simpul keputusan predikat: Node 2, Node 5, dan Node 7.
+$$V(G) = P + 1 = 3 + 1 = 4$$
+- Berdasarkan Edge ($E$) dan Node ($N$):
+Jumlah Edge ($E$) = 11, Jumlah Node ($N$) = 9 (dengan menyatukan seluruh jalur keluar ke terminal Node 10).
+$$V(G) = E - N + 2 = 11 - 9 + 2 = 4$$
+
+### Daftar Independent Basis Paths:
+- Path 1 (Data Kosong, lastName terisi): 1 - 2 - 4 - 5 - 6 - 10
+- Path 2 (Data Kosong, lastName == null): 1 - 2 - 3 - 4 - 5 - 6 - 10
+- Path 3 (Ditemukan Tepat 1 Data): 1 - 2 - 4 - 5 - 7 - 8 - 10
+- Path 4 (Ditemukan Banyak Data): 1 - 2 - 4 - 5 - 7 - 9 - 10
