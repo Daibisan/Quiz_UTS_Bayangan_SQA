@@ -61,3 +61,5 @@ $$V(G) = E - N + 2 = 11 - 9 + 2 = 4$$
 - Path 2 (Data Kosong, lastName == null): 1 - 2 - 3 - 4 - 5 - 6 - 10
 - Path 3 (Ditemukan Tepat 1 Data): 1 - 2 - 4 - 5 - 7 - 8 - 10
 - Path 4 (Ditemukan Banyak Data): 1 - 2 - 4 - 5 - 7 - 9 - 10
+
+## Rancangan Kasus Uji & Evaluasi Branch Coverage
