@@ -125,7 +125,7 @@ $$V(G) = P + 1 = 3 + 1 = 4$$
 - Metode 2: Edge ($E$) dan Node ($N$)Jumlah Edge ($E$) = 11, Jumlah Node ($N$) = 9 (dengan mengarahkan semua cabang return ke Node 10).
 $$V(G) = E - N + 2 = 11 - 9 + 2 = 4$$
 
-### 2.4.1 Daftar Independent Basis Paths:
+### 2.4.2 Daftar Independent Basis Paths:
 - Path 1 (Data Kosong, lastName terisi): 1 - 2 - 4 - 5 - 6 - 10
 - Path 2 (Data Kosong, lastName == null): 1 - 2 - 3 - 4 - 5 - 6 - 10
 - Path 3 (Ditemukan Tepat 1 Data): 1 - 2 - 4 - 5 - 7 - 8 - 10
