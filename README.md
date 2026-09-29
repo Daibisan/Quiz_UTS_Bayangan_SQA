@@ -85,3 +85,72 @@ $$\text{Branch Coverage (BC)} = \frac{8 \text{ cabang tereksekusi}}{8 \text{ tot
 - Statement Coverage (SC): $13 / 13 \text{ simpul} = \mathbf{100\%}$   
 - Branch Coverage (BC): $8 / 8 \text{ cabang keputusan} = \mathbf{100\%}$   
 - Loop Coverage (LC): Mencakup kondisi $0$ iterasi (bypass loop), $1$ iterasi (TC-01 sampai 04), dan perulangan jamak $>1$ iterasi (TC-05) $= \mathbf{100\%}$.
+
+# 2. Analisis Open-Source Project (Spring Framework)
+
+## 2.1 Identifikasi Komponen & Target Repositori
+- Repository Publik: [spring-projects/spring-petclinic](https://github.com/spring-projects/spring-petclinic)
+- Package: org.springframework.samples.petclinic.owner
+- File / Class: OwnerController.java
+- Target Method: processFindForm (Method penanganan pencarian entitas Owner dengan multi-kondisi pencabangan).
+
+## 2.2 Cuplikan Kode Sumber (Java) & Pemetaan Simpul (Nodes)
+``` java
+     @GetMapping("/owners")
+(1)  public String processFindForm(@RequestParam(defaultValue = "1") int page, Owner owner, BindingResult result, Model model) {
+(2)      if (owner.getLastName() == null) {
+(3)          owner.setLastName(""); 
+         }
+(4)      Page ownersResults = findPaginatedForOwnersLastName(page, owner.getLastName());
+(5)      if (ownersResults.isEmpty()) {
+(6)          result.rejectValue("lastName", "notFound", "not found");
+             return "owners/findOwners";
+(7)      } else if (ownersResults.getTotalElements() == 1) {
+(8)          owner = ownersResults.iterator().next();
+             return "redirect:/owners/" + owner.getId();
+         } else {
+(9)          return addPaginationModel(page, model, ownersResults);
+         }
+(10)  }
+```
+
+## 2.3 Control Flow Graph (CFG)
+![CFG2](./img/cfg2.png)
+
+## 2.4 Cyclomatic Complexity & Jalur Independen (Basis Paths)
+
+### 2.4.1 Perhitungan Cyclomatic Complexity ($V(G)$):
+- Metode 1: Predicate Nodes ($P$)Terdapat 3 simpul keputusan predikat: Node 2, Node 5, dan Node 7.
+$$V(G) = P + 1 = 3 + 1 = 4$$
+- Metode 2: Edge ($E$) dan Node ($N$)Jumlah Edge ($E$) = 11, Jumlah Node ($N$) = 9 (dengan mengarahkan semua cabang return ke Node 10).
+$$V(G) = E - N + 2 = 11 - 9 + 2 = 4$$
+
+### 2.4.1 Daftar Independent Basis Paths:
+- Path 1 (Data Kosong, lastName terisi): 1 - 2 - 4 - 5 - 6 - 10
+- Path 2 (Data Kosong, lastName == null): 1 - 2 - 3 - 4 - 5 - 6 - 10
+- Path 3 (Ditemukan Tepat 1 Data): 1 - 2 - 4 - 5 - 7 - 8 - 10
+- Path 4 (Ditemukan Banyak Data): 1 - 2 - 4 - 5 - 7 - 9 - 10
+
+## 2.5 Rancangan Kasus Uji (Test Cases Suite)
+| TC ID | Input owner.getLastName() | Kondisi Database (ownersResults) | Target Path | Output Return View | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **TC-01** | `"Franklin"` | Empty (0 data) | Path 1 | `"owners/findOwners"` | **PASS** |
+| **TC-02** | `null` | Empty (0 data) | Path 2 | `"owners/findOwners"` | **PASS** |
+| **TC-03** | `"Davis"` | Single Record (1 data) | Path 3 | `"redirect:/owners/2"` | **PASS** |
+| **TC-04** | `""` | Multiple Records (>1 data) | Path 4 | `"owners/ownersList"` | **PASS** |
+
+## 2.6 Tabel Analisis Branch Coverage (BC)
+| ID Cabang | Decision Node | Pernyataan Keputusan (Predicate) | Evaluasi | Alur Simpul (Edge) | Dieksekusi oleh | Kondisi Input & Database | Status Cakupan |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **BR-01** | Node 2 | `if (owner.getLastName() == null)` | True | 2 → 3 | TC-02 | `owner.getLastName() == null` | Covered (100%) |
+| **BR-02** | Node 2 | `if (owner.getLastName() == null)` | False | 2 → 4 | TC-01, TC-03, TC-04 | `lastName` terisi (`"Franklin"`, `"Davis"`, `""`) | Covered (100%) |
+| **BR-03** | Node 5 | `if (ownersResults.isEmpty())` | True | 5 → 6 | TC-01, TC-02 | Hasil query database kosong (0 data) | Covered (100%) |
+| **BR-04** | Node 5 | `if (ownersResults.isEmpty())` | False | 5 → 7 | TC-03, TC-04 | Hasil query database tidak kosong (\(\ge 1\) data) | Covered (100%) |
+| **BR-05** | Node 7 | `else if (ownersResults.getTotalElements() == 1)` | True | 7 → 8 | TC-03 | Total data database tepat 1 record | Covered (100%) |
+| **BR-06** | Node 7 | `else if (ownersResults.getTotalElements() == 1)` | False | 7 → 9 | TC-04 | Total data database >1 record (multipel) | Covered (100%) |
+
+$$\text{Branch Coverage (BC)} = \frac{6 \text{ cabang tereksekusi}}{6 \text{ total cabang}} \times 100\% = \mathbf{100\%}$$
+
+## 2.7 Evaluasi Metrik Cakupan
+- Statement Coverage (SC): $10 / 10 \text{ simpul} = \mathbf{100\%}$   
+- Branch Coverage (BC): $6 / 6 \text{ cabang logika} = \mathbf{100\%}$
