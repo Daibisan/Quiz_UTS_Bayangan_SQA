@@ -44,7 +44,7 @@ import math
 
 ## 1.4 Cyclomatic Complexity & Jalur Independen (Basis Paths)
 
-### 1.4.1 Perhitungan Cyclomatic Complexity ($V(G)$):
+### 1.4.1 Perhitungan Cyclomatic Complexity (V(G)):
 - Metode 1: Predicate Nodes ($P$)
 Terdapat 4 titik percabangan keputusan logika: Node 2, Node 4, Node 7, dan Node 9.
 $$V(G) = P + 1 = 4 + 1 = 5$$
@@ -119,7 +119,7 @@ $$\text{Branch Coverage (BC)} = \frac{8 \text{ cabang tereksekusi}}{8 \text{ tot
 
 ## 2.4 Cyclomatic Complexity & Jalur Independen (Basis Paths)
 
-### 2.4.1 Perhitungan Cyclomatic Complexity ($V(G)$):
+### 2.4.1 Perhitungan Cyclomatic Complexity (V(G)):
 - Metode 1: Predicate Nodes ($P$)Terdapat 3 simpul keputusan predikat: Node 2, Node 5, dan Node 7.
 $$V(G) = P + 1 = 3 + 1 = 4$$
 - Metode 2: Edge ($E$) dan Node ($N$)Jumlah Edge ($E$) = 11, Jumlah Node ($N$) = 9 (dengan mengarahkan semua cabang return ke Node 10).
