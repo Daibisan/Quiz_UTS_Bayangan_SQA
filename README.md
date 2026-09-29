@@ -1,9 +1,7 @@
-# Analisis White-Box Testing: Penyelesaian Persamaan Kuadrat
-
+# 1. Analisis White-Box Testing: Penyelesaian Persamaan Kuadrat
 Dokumentasi analisis pengujian struktural (*White-Box Testing*) pada program penyelesaian persamaan kuadrat (\(ax^2 + bx + c = 0\)) dengan parameter pengukuran *Statement Coverage* (SC), *Branch Coverage* (BC), dan *Loop Coverage* (LC) mengacu pada paper Khairunnisya dkk. (EECSI 2017).
 
-## Algoritma Program
-
+## 1.1 Algoritma Program
 1. Inisialisasi variabel perulangan ulang = 'Y'.
 2. Evaluasi kondisi loop ulang == 'Y'. Jika tidak terpenuhi, program berhenti.
 3. Baca nilai input koefisien a, b, dan c.
@@ -16,8 +14,7 @@ Dokumentasi analisis pengujian struktural (*White-Box Testing*) pada program pen
 - Jika D < 0: Cetak "Akar kompleks / imajiner".
 6. Minta input konfirmasi dari pengguna untuk mengulang program (ulang).Kembali ke evaluasi kondisi loop (Langkah 2).
 
-## Kode Program & Pemetaan Simpul (Nodes)
-
+## 1.2 Kode Program & Pemetaan Simpul (Nodes)
 ```python
 import math
 
@@ -42,24 +39,49 @@ import math
 (12)     ulang = input("Hitung lagi? (Y/N): ")
 ```
 
-## Control Flow Graph (CFG)
-
+## 1.3 Control Flow Graph (CFG)
 ![CFG](./img/cfg.png)
 
-## Cyclomatic Complexity & Jalur Independen (Basis Paths)
+## 1.4 Cyclomatic Complexity & Jalur Independen (Basis Paths)
 
-### Perhitungan Cyclomatic Complexity ($V(G)$):
-- Berdasarkan Predicate Nodes ($P$):
-Terdapat 3 simpul keputusan predikat: Node 2, Node 5, dan Node 7.
-$$V(G) = P + 1 = 3 + 1 = 4$$
-- Berdasarkan Edge ($E$) dan Node ($N$):
-Jumlah Edge ($E$) = 11, Jumlah Node ($N$) = 9 (dengan menyatukan seluruh jalur keluar ke terminal Node 10).
-$$V(G) = E - N + 2 = 11 - 9 + 2 = 4$$
+### 1.4.1 Perhitungan Cyclomatic Complexity ($V(G)$):
+- Metode 1: Predicate Nodes ($P$)
+Terdapat 4 titik percabangan keputusan logika: Node 2, Node 4, Node 7, dan Node 9.
+$$V(G) = P + 1 = 4 + 1 = 5$$
+- Metode 2: Edge ($E$) dan Node ($N$)Jumlah Edge ($E$) = 16 alur, Jumlah Node ($N$) = 13 simpul.
+$$V(G) = E - N + 2 = 16 - 13 + 2 = 5$$
 
-### Daftar Independent Basis Paths:
-- Path 1 (Data Kosong, lastName terisi): 1 - 2 - 4 - 5 - 6 - 10
-- Path 2 (Data Kosong, lastName == null): 1 - 2 - 3 - 4 - 5 - 6 - 10
-- Path 3 (Ditemukan Tepat 1 Data): 1 - 2 - 4 - 5 - 7 - 8 - 10
-- Path 4 (Ditemukan Banyak Data): 1 - 2 - 4 - 5 - 7 - 9 - 10
+### 1.4.2 Daftar Independent Basis Paths:
+- Path 1 (Bypass Loop): 1 - 2 - 13
+- Path 2 (Persamaan Linier / $a = 0$): 1 - 2 - 3 - 4 - 5 - 12 - 2 - 13
+- Path 3 (Akar Riil Berbeda / $D > 0$): 1 - 2 - 3 - 4 - 6 - 7 - 8 - 12 - 2 - 13
+- Path 4 (Akar Kembar / $D = 0$): 1 - 2 - 3 - 4 - 6 - 7 - 9 - 10 - 12 - 2 - 13
+- Path 5 (Akar Imajiner / $D < 0$): 1 - 2 - 3 - 4 - 6 - 7 - 9 - 11 - 12 - 2 - 13
 
-## Rancangan Kasus Uji & Evaluasi Branch Coverage
+## 1.5 Rancangan Kasus Uji
+| TC ID | Input (a,b,c) | Nilai Diskriminan (D) | Expected Result | Target Path | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **TC-01** | `a=0, b=2, c=4` | - | Bukan persamaan kuadrat (Linier) | Path 2 | **PASS** |
+| **TC-02** | `a=1, b=−5, c=6` | \((-5)^2 - 4(1)(6) = 1\) | Dua akar riil berbeda (\(x_1=3, x_2=2\)) | Path 3 | **PASS** |
+| **TC-03** | `a=1, b=−4, c=4` | \((-4)^2 - 4(1)(4) = 0\) | Dua akar kembar (\(x=2\)) | Path 4 | **PASS** |
+| **TC-04** | `a=1, b=2, c=5` | \((2)^2 - 4(1)(5) = -16\) | Akar kompleks / imajiner | Path 5 | **PASS** |
+| **TC-05** | Eksekusi TC-02 (`ulang='Y'`), lanjut TC-03 (`ulang='N'`) | - | Program berjalan 2 siklus loop lalu selesai | Path 3 → Path 4 → Path 1 | **PASS** |
+
+## 1.6 Evaluasi Branch Coverage
+| ID Cabang | Decision Node | Pernyataan Keputusan (Predicate) | Evaluasi | Alur Simpul (Edge) | Dieksekusi oleh | Kondisi Input Uji | Status Cakupan |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **BR-01** | Node 2 | `while ulang.upper() == "Y"` | True | 2 → 3 | TC-01, TC-02, TC-03, TC-04, TC-05 | `ulang = "Y"` | Covered (100%) |
+| **BR-02** | Node 2 | `while ulang.upper() == "Y"` | False | 2 → 13 | TC-05 | `ulang = "N"` (keluar loop) | Covered (100%) |
+| **BR-03** | Node 4 | `if a == 0` | True | 4 → 5 | TC-01 | `a=0, b=2, c=4` | Covered (100%) |
+| **BR-04** | Node 4 | `if a == 0` | False | 4 → 6 | TC-02, TC-03, TC-04 | \(a \neq 0\) (`a=1`) | Covered (100%) |
+| **BR-05** | Node 7 | `if D > 0` | True | 7 → 8 | TC-02 | `a=1, b=−5, c=6` \(\rightarrow D=1\) | Covered (100%) |
+| **BR-06** | Node 7 | `if D > 0` | False | 7 → 9 | TC-03, TC-04 | \(D \le 0\) (\(D=0\) atau \(D=-16\)) | Covered (100%) |
+| **BR-07** | Node 9 | `elif D == 0` | True | 9 → 10 | TC-03 | `a=1, b=−4, c=4` \(\rightarrow D=0\) | Covered (100%) |
+| **BR-08** | Node 9 | `elif D == 0` | False | 9 → 11 | TC-04 | `a=1, b=2, c=5` \(\rightarrow D=-16\) | Covered (100%) |
+
+$$\text{Branch Coverage (BC)} = \frac{8 \text{ cabang tereksekusi}}{8 \text{ total cabang}} \times 100\% = \mathbf{100\%}$$
+
+## 1.7 Evaluasi Metrik Cakupan
+- Statement Coverage (SC): $13 / 13 \text{ simpul} = \mathbf{100\%}$   
+- Branch Coverage (BC): $8 / 8 \text{ cabang keputusan} = \mathbf{100\%}$   
+- Loop Coverage (LC): Mencakup kondisi $0$ iterasi (bypass loop), $1$ iterasi (TC-01 sampai 04), dan perulangan jamak $>1$ iterasi (TC-05) $= \mathbf{100\%}$.
